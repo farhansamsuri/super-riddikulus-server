@@ -88,17 +88,39 @@ module.exports = {
         return userProfile;
     },
 
+
+    updateUserPassword: async(user, oldPass, newPass) => {
+
+        const userExists = await User.findById(user);
+        if (!userExists) {
+            throw new Error(`User ${user} not found`);
+        }
+
+        const passwordCheck = await bcrypt.compare(oldPass, userExists.password);
+        
+        if (!passwordCheck) {
+            throw new Error("The password you entered is incorrect. Please try again.");
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPass, salt);
+
+        const updatePassword = await User.findByIdAndUpdate(user, {password:hashedPassword}, {
+            new: true,
+        });
+  
+        return updatePassword;
+    },
+
     updateUserProfile: async (user, body) => { 
         
-        const _id = user
-
-        const userExists = await User.findOne(_id);
-
+        const userExists = await User.findById(user);
+        console.log('User', user)
         if (!userExists) {
             throw new Error("User not found");
         }
 
-        const updateProfile = await User.findOneAndUpdate(_id, body, {
+        const updateProfile = await User.findByIdAndUpdate(user, body, {
             new: true,
         });
   
@@ -156,6 +178,7 @@ module.exports = {
 
             const userExists = await User.findById(user);
         if (!userExists) {
+            console.log('userDetails:', user)
             throw new Error(`User ${user} not found`);
         } 
 

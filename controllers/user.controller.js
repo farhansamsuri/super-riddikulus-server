@@ -1,5 +1,5 @@
 const userService = require('../services/user.service');
-const { registerOneUser, addOneSpell, deleteOneSpell, addOneElixir, deleteOneElixir } = require("../services/user.service");
+const { registerOneUser, addOneSpell, deleteOneSpell, addOneElixir, deleteOneElixir, updateUserPassword } = require("../services/user.service");
 
 
 //POST /user
@@ -94,8 +94,7 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
 
     // const userId = req.user.id;
-    const userId = req.user.id;
-    const body = req.body;
+    const {user, body} = req.body
 
     let result = {
         message: null,
@@ -104,8 +103,35 @@ const updateProfile = async (req, res) => {
     };
 
     try {
-        const data = await userService.updateUserProfile(userId, body);
+        const data = await userService.updateUserProfile(user, body);
         result.message = `Profile details updated!`;
+        result.status = 200;
+        result.data = data;
+    } catch (error) {
+        console.error(error);
+        result.message = error.message;
+        result.status = 400;
+    } finally {
+        return res.json(result);
+    }
+
+};
+
+//PUT user/password
+const updatePassword = async (req, res) => {
+
+    // const userId = req.user.id;
+    const {user, oldPass, newPass} = req.body;
+
+    let result = {
+        message: null,
+        status: null,
+        data: null,
+    };
+
+    try {
+        const data = await updateUserPassword(user, oldPass, newPass);
+        result.message = `Password updated!`;
         result.status = 200;
         result.data = data;
     } catch (error) {
@@ -247,4 +273,13 @@ const deleteElixir = async(req, res) => {
 
 }
 
-module.exports = { registerUser, loginUser, getProfile, updateProfile, logoutUser, addSpell, deleteSpell, addElixir, deleteElixir }; 
+module.exports = { registerUser, 
+                    loginUser, 
+                    getProfile,
+                    updateProfile, 
+                    logoutUser, 
+                    addSpell, 
+                    deleteSpell, 
+                    addElixir, 
+                    deleteElixir, 
+                    updatePassword }; 
