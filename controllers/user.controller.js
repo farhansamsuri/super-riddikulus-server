@@ -121,7 +121,7 @@ const updateProfile = async (req, res) => {
 const updatePassword = async (req, res) => {
 
     // const userId = req.user.id;
-    const {user, oldPass, newPass} = req.body;
+    const {user, oldPass, newPass, confirmPass} = req.body;
 
     let result = {
         message: null,
@@ -130,7 +130,7 @@ const updatePassword = async (req, res) => {
     };
 
     try {
-        const data = await updateUserPassword(user, oldPass, newPass);
+        const data = await updateUserPassword(user, oldPass, newPass, confirmPass);
         result.message = `Password updated!`;
         result.status = 200;
         result.data = data;

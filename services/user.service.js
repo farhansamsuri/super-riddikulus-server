@@ -67,7 +67,7 @@ module.exports = {
 
             const returnData = {
                 id: user._id,
-                name : user.username,
+                username : user.username,
                 email: user.email,
                 gender: user.gender,
                 house: user.house,
@@ -89,17 +89,19 @@ module.exports = {
     },
 
 
-    updateUserPassword: async(user, oldPass, newPass) => {
+    updateUserPassword: async(user, oldPass, newPass, confirmPass) => {
 
         const userExists = await User.findById(user);
         if (!userExists) {
             throw new Error(`User ${user} not found`);
+        } else if (newPass !== confirmPass) {
+            throw new Error (`New Passwords does not match!`)
         }
 
         const passwordCheck = await bcrypt.compare(oldPass, userExists.password);
         
         if (!passwordCheck) {
-            throw new Error("The password you entered is incorrect. Please try again.");
+            throw new Error("The old password you entered is incorrect. Please try again.");
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -124,6 +126,7 @@ module.exports = {
             new: true,
         });
   
+        updateProfile.save();
         return updateProfile;
     },
 
